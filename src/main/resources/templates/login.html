@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="/js/vue.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="/js/element-ui.js"></script>
+    <link rel="stylesheet" href="/css/fonts/element-ui.css">
+
+    <style type="text/css">
+        .el-row {
+            margin: 20px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="root">
+    <el-menu class="el-menu-demo" mode="horizontal" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu-item index="1">基金定投</el-menu-item>
+        <el-menu-item index="3" style="float: right">
+            <template>
+                <el-button type="text" @click="dialogFormVisible = true">登录</el-button>
+            </template>
+        </el-menu-item>
+    </el-menu>
+
+    <el-dialog title="登录" :visible.sync="dialogFormVisible" width="30%">
+        <el-form label-width="100px" :model="form">
+            <el-form-item label="用户名">
+                <el-col :span="16">
+                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="密码">
+                <el-col :span="16">
+                    <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
+                </el-col>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary">登录</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+
+    <el-row :gutter="20">
+        <el-col :span="12" :offset="6"><div class="grid-content bg-purple">
+            <el-input
+                    placeholder="请输入内容"
+                    suffix-icon="el-icon-search">
+            </el-input>
+        </div></el-col>
+    </el-row>
+
+    <el-row :gutter="20">
+        <el-col :span="12" :offset="6"><div class="grid-content bg-purple">
+            <template>
+                <el-tabs v-model="activeName">
+                    <el-tab-pane label="股票型" name="mixed">
+                        <template>
+                            <el-table :data="tableData" style="width: 100%">
+                                <el-table-column prop="code" label="基金代码"></el-table-column>
+                                <el-table-column prop="name" label="名称"></el-table-column>
+                                <el-table-column prop="netValue" label="单位净值"></el-table-column>
+                                <el-table-column prop="yieldOfOneYear" label="近1年定投收益"></el-table-column>
+                                <el-table-column prop="yieldOfTwoYear" label="近2年定投收益"></el-table-column>
+                                <el-table-column prop="yieldOfThreeYear" label="近3年定投收益"></el-table-column>
+                                <el-table-column prop="yieldOfFiveYear" label="近5年定投收益"></el-table-column>
+                            </el-table>
+                        </template>
+                    </el-tab-pane>
+                    <el-tab-pane label="混合型" name="stock">股票型</el-tab-pane>
+                </el-tabs>
+            </template>
+        </div></el-col>
+    </el-row>
+</div>
+</body>
+
+<script>
+    var vue = new Vue({
+        el: '#root',
+        data: {
+            dialogFormVisible: false,
+            form: {
+                name: '',
+                password: ''
+            },
+            formLabelWidth: '120px',
+            tableData: [],
+            activeName: 'mixed'
+        },
+        mounted() {
+            axios.post('http://localhost:8099/fund/search', {
+                type: 5,
+                code: "",
+                name: "",
+                orderBy: "yield_of_two_year",
+                sort: "desc",
+                limit: 5
+            }).then(function (response) {
+                vue.tableData = response.data.data;
+                console.log("search success");
+            }).catch(function (error) {
+                console.log(error);
+            });
+        }
+    });
+</script>
+
+</html>
